@@ -1,0 +1,28 @@
+name: Create Azure App Service
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  create-app-service:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Azure CLI
+        uses: azure/CLI@v1
+        with:
+          azcliversion: latest
+
+      - name: Login to Azure
+        run: |
+          az login --service-principal -u ${{ secrets.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
+          az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Create Azure App Service
+        run: |
+          az webapp create --name myapp --resource-group RG-BakerHughes_Futura-NONHCNONPROD-EastUS-dev --plan YourAppServicePlan --runtime "node|14-lts"
